@@ -1,0 +1,495 @@
+EmployeeDaoImpl：
+
+package com.igeekhome.dao.impl;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
+
+import com.igeekhome.dao.IEmpDao;
+import com.igeekhome.pojo.Dept;
+import com.igeekhome.pojo.Employee;
+import com.igeekhome.util.JDBCUtil;
+
+public class EmpDaoImpl implements IEmpDao {
+	
+	private List<Map<String, Object>> query;
+
+	@Override
+	public  List<Employee> selectEmps(Integer page, Integer limit) {
+		List<Employee> emps = new ArrayList<>();
+		QueryRunner qr = new QueryRunner(JDBCUtil.getDataSource());
+		//select e.eno,e.name,e.sex,e.telphone,e.address,e.hiredate,d.deptno,d.deptname,d.status from t_employee e left join t_dept d on e.deptno = d.deptno where 1=1
+		//String sql = "select Employeeid,Userid,Deptid,Employeename,Employeesex,Employeeage,Employeeaddress,Employeeposition,Employeesalary,Employeesalary,EmployeeRVDays,Employeestatus from Employee limit ?,?";
+		String sql = "select e.employeeid,e.userid,e.employeename,e.employeesex,e.employeeage,e.employeeaddress,e.employeeposition,e.employeesalary,e.employeesalary,e.employeeVDays,e.employeeRVDays,e.employeestatus,d.deptid,d.deptname,d.deptstatus from Employee e left join Dept d on e.deptid = d.deptid limit ?,?";
+		//select e.Employeeid,e.Userid,d.Deptid,e.Employeename,e.Employeesex,e.Employeeage,e.Employeeaddress,e.Employeeposition,e.Employeesalary,e.Employeesalary,e.EmployeeRVDays,e.Employeestatus,d.Deptname,d.Deptstatus from Employee e left join Dept d on e.Deptid = d.Deptid limit ?,?
+		Integer[] params = new Integer[] {(page-1)*limit,limit};
+		try {
+			//return qr.query(sql, new BeanListHandler<Employee>(Employee.class), params);
+			//����һ��
+			List<Map<String, Object>> query = qr.query(sql, new MapListHandler(), params);
+			for (Map<String, Object> map : query) {
+				//map.get("eno");
+				Dept dept = new Dept();
+				Employee emp = new Employee();
+				try {
+					//new MyBeanUtils(false)
+					BeanUtils.populate(dept,map);
+					//new MyBeanUtils(false);
+					BeanUtils.populate(emp, map);
+					emp.setDept(dept);
+					emps.add(emp);
+				}  catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			//��������
+			//return qr.query(sql, new BeanListHandler<Employee>(Employee.class), params);
+			
+			return emps;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			ConvertUtils.deregister();
+		}
+		return null;
+	}
+
+	@Override
+	public Integer selectCount() {
+		QueryRunner qr = new QueryRunner(JDBCUtil.getDataSource());
+		String sql = "select count(*) from Employee";
+
+		try {
+			return (Integer)qr.query(sql, new ScalarHandler<Long>()).intValue();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public void deleteEmp(String eno) {
+		QueryRunner qr = new QueryRunner(JDBCUtil.getDataSource());
+		String sql = "delete from Employee where Employeeid = ?";
+		try {
+			qr.update(sql, eno);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public Employee selectEmp(String eno) {
+		QueryRunner qr = new QueryRunner(JDBCUtil.getDataSource());
+		String sql = "select Employeeid,Userid,Deptid,Employeename,Employeesex,Employeeage,Employeeaddress,Employeeposition,Employeesalary,EmployeeVDays,EmployeeRVDays,Employeestatus from Employee where Employeeid = ?";
+
+		try {
+			return qr.query(sql, new BeanHandler<Employee>(Employee.class),eno);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+//	@Override
+//	public void insert(Employee emp) {
+//		// TODO Auto-generated method stub
+//		QueryRunner qr = new QueryRunner(JDBCUtil.getDataSource());
+//		String sql = "insert into t_employee values (?,?,?,?,?,?,?)";
+//		Object[] params = new Object[] {emp.getEno(),emp.getName(),emp.getSex(),emp.getTelphone(),emp.getAddress(),new java.sql.Date(emp.getHiredate().getTime()),emp.getDeptno()};
+//		
+//		try {
+//			qr.update(sql,params);
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//	}
+}
+
+pojo:
+Employee:
+
+package com.igeekhome.pojo;
+
+public class Employee {
+
+	private String employeeid;
+	private String userid;
+	private String employeename;
+	private String employeesex;
+	private Integer employeeage;
+	private String employeeaddress;
+	private String employeeposition;
+	private Double employeesalary;
+	private Integer employeeVDays;
+	private Integer employeeRVDays;
+	private Integer employeestatus;
+	private Integer deptid;
+	private Dept dept;
+	/**
+	 * @param employeeid
+	 * @param userid
+	 * @param employeename
+	 * @param employeesex
+	 * @param employeeage
+	 * @param employeeaddress
+	 * @param employeeposition
+	 * @param employeesalary
+	 * @param employeeVDays
+	 * @param employeeRVDays
+	 * @param employeestatus
+	 * @param deptid
+	 */
+	public Employee(String employeeid, String userid, String employeename, String employeesex, Integer employeeage,
+			String employeeaddress, String employeeposition, Double employeesalary, Integer employeeVDays,
+			Integer employeeRVDays, Integer employeestatus) {
+		super();
+		this.employeeid = employeeid;
+		this.userid = userid;
+		this.employeename = employeename;
+		this.employeesex = employeesex;
+		this.employeeage = employeeage;
+		this.employeeaddress = employeeaddress;
+		this.employeeposition = employeeposition;
+		this.employeesalary = employeesalary;
+		this.employeeVDays = employeeVDays;
+		this.employeeRVDays = employeeRVDays;
+		this.employeestatus = employeestatus;
+	}
+	/**
+	 * 
+	 */
+	public Employee() {
+		super();
+	}
+	/**
+	 * @return the employeeid
+	 */
+	public String getEmployeeid() {
+		return employeeid;
+	}
+	/**
+	 * @param employeeid the employeeid to set
+	 */
+	public void setEmployeeid(String employeeid) {
+		this.employeeid = employeeid;
+	}
+	/**
+	 * @return the userid
+	 */
+	public String getUserid() {
+		return userid;
+	}
+	/**
+	 * @param userid the userid to set
+	 */
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	/**
+	 * @return the employeename
+	 */
+	public String getEmployeename() {
+		return employeename;
+	}
+	/**
+	 * @param employeename the employeename to set
+	 */
+	public void setEmployeename(String employeename) {
+		this.employeename = employeename;
+	}
+	/**
+	 * @return the employeesex
+	 */
+	public String getEmployeesex() {
+		return employeesex;
+	}
+	/**
+	 * @param employeesex the employeesex to set
+	 */
+	public void setEmployeesex(String employeesex) {
+		this.employeesex = employeesex;
+	}
+	/**
+	 * @return the employeeage
+	 */
+	public Integer getEmployeeage() {
+		return employeeage;
+	}
+	/**
+	 * @param employeeage the employeeage to set
+	 */
+	public void setEmployeeage(Integer employeeage) {
+		this.employeeage = employeeage;
+	}
+	/**
+	 * @return the employeeaddress
+	 */
+	public String getEmployeeaddress() {
+		return employeeaddress;
+	}
+	/**
+	 * @param employeeaddress the employeeaddress to set
+	 */
+	public void setEmployeeaddress(String employeeaddress) {
+		this.employeeaddress = employeeaddress;
+	}
+	/**
+	 * @return the employeeposition
+	 */
+	public String getEmployeeposition() {
+		return employeeposition;
+	}
+	/**
+	 * @param employeeposition the employeeposition to set
+	 */
+	public void setEmployeeposition(String employeeposition) {
+		this.employeeposition = employeeposition;
+	}
+	/**
+	 * @return the employeesalary
+	 */
+	public Double getEmployeesalary() {
+		return employeesalary;
+	}
+	/**
+	 * @param employeesalary the employeesalary to set
+	 */
+	public void setEmployeesalary(Double employeesalary) {
+		this.employeesalary = employeesalary;
+	}
+	/**
+	 * @return the employeeVDays
+	 */
+	public Integer getEmployeeVDays() {
+		return employeeVDays;
+	}
+	/**
+	 * @param employeeVDays the employeeVDays to set
+	 */
+	public void setEmployeeVDays(Integer employeeVDays) {
+		this.employeeVDays = employeeVDays;
+	}
+	/**
+	 * @return the employeeRVDays
+	 */
+	public Integer getEmployeeRVDays() {
+		return employeeRVDays;
+	}
+	/**
+	 * @param employeeRVDays the employeeRVDays to set
+	 */
+	public void setEmployeeRVDays(Integer employeeRVDays) {
+		this.employeeRVDays = employeeRVDays;
+	}
+	/**
+	 * @return the employeestatus
+	 */
+	public Integer getEmployeestatus() {
+		return employeestatus;
+	}
+	/**
+	 * @param employeestatus the employeestatus to set
+	 */
+	public void setEmployeestatus(Integer employeestatus) {
+		this.employeestatus = employeestatus;
+	}
+	/**
+	 * @return the deptid
+	 */
+	public Integer getDeptid() {
+		return deptid;
+	}
+	/**
+	 * @param deptid the deptid to set
+	 */
+	public void setDeptid(Integer deptid) {
+		this.deptid = deptid;
+	}
+	/**
+	 * @return the dept
+	 */
+	public Dept getDept() {
+		return dept;
+	}
+	/**
+	 * @param dept the dept to set
+	 */
+	public void setDept(Dept dept) {
+		this.dept = dept;
+	}
+	@Override
+	public String toString() {
+		return "Employee [employeeid=" + employeeid + ", userid=" + userid + ", employeename=" + employeename
+				+ ", employeesex=" + employeesex + ", employeeage=" + employeeage + ", employeeaddress="
+				+ employeeaddress + ", employeeposition=" + employeeposition + ", employeesalary=" + employeesalary
+				+ ", employeeVDays=" + employeeVDays + ", employeeRVDays=" + employeeRVDays + ", employeestatus="
+				+ employeestatus + ", deptid=" + deptid + ", dept=" + dept + "]";
+	}
+	
+}
+
+Dept:
+
+package com.igeekhome.pojo;
+
+public class Dept {
+	
+	private Integer deptid;
+	private String deptname;
+	private Integer deptstatus;
+	/**
+	 * @param deptid
+	 * @param deptname
+	 * @param deptstatus
+	 */
+	public Dept(Integer deptid, String deptname, Integer deptstatus) {
+		super();
+		this.deptid = deptid;
+		this.deptname = deptname;
+		this.deptstatus = deptstatus;
+	}
+	/**
+	 * 
+	 */
+	public Dept() {
+		super();
+	}
+	/**
+	 * @return the deptid
+	 */
+	public Integer getDeptid() {
+		return deptid;
+	}
+	/**
+	 * @param deptid the deptid to set
+	 */
+	public void setDeptid(Integer deptid) {
+		this.deptid = deptid;
+	}
+	/**
+	 * @return the deptname
+	 */
+	public String getDeptname() {
+		return deptname;
+	}
+	/**
+	 * @param deptname the deptname to set
+	 */
+	public void setDeptname(String deptname) {
+		this.deptname = deptname;
+	}
+	/**
+	 * @return the deptstatus
+	 */
+	public Integer getDeptstatus() {
+		return deptstatus;
+	}
+	/**
+	 * @param deptstatus the deptstatus to set
+	 */
+	public void setDeptstatus(Integer deptstatus) {
+		this.deptstatus = deptstatus;
+	}
+	@Override
+	public String toString() {
+		return "Dept [deptid=" + deptid + ", deptname=" + deptname + ", deptstatus=" + deptstatus + "]";
+	}
+	
+}
+
+
+mysql:
+
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : MariaDB
+Source Server Version : 50505
+Source Host           : 47.102.126.108:3306
+Source Database       : myproject
+
+Target Server Type    : MYSQL
+Target Server Version : 50505
+File Encoding         : 65001
+
+Date: 2019-11-27 22:25:17
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for `Dept`
+-- ----------------------------
+DROP TABLE IF EXISTS `Dept`;
+CREATE TABLE `Dept` (
+  `Deptid` int(11) NOT NULL AUTO_INCREMENT COMMENT '部门编号',
+  `Deptname` varchar(50) NOT NULL COMMENT '部门名称',
+  `Deptstatus` int(11) NOT NULL COMMENT '部门状态（0-正常 1-关闭）',
+  PRIMARY KEY (`Deptid`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of Dept
+-- ----------------------------
+INSERT INTO `Dept` VALUES ('1', '研发部', '0');
+INSERT INTO `Dept` VALUES ('2', '人事部', '0');
+INSERT INTO `Dept` VALUES ('3', '财务部', '0');
+INSERT INTO `Dept` VALUES ('4', '测试部', '0');
+
+-- ----------------------------
+-- Table structure for `Employee`
+-- ----------------------------
+DROP TABLE IF EXISTS `Employee`;
+CREATE TABLE `Employee` (
+  `Employeeid` int(11) NOT NULL COMMENT '员工编号',
+  `Userid` int(11) NOT NULL COMMENT '用户编号',
+  `Deptid` int(11) NOT NULL COMMENT '部门编号',
+  `Employeename` varchar(50) NOT NULL COMMENT '员工姓名',
+  `Employeesex` int(11) NOT NULL COMMENT '员工性别',
+  `Employeeage` int(11) NOT NULL COMMENT '员工年龄',
+  `Employeeaddress` varchar(100) DEFAULT NULL COMMENT '员工住址',
+  `Employeeposition` varchar(100) DEFAULT NULL COMMENT '员工职位',
+  `Employeesalary` double NOT NULL COMMENT '基本工资',
+  `EmployeeVDays` int(11) DEFAULT NULL COMMENT '基本休假天数',
+  `EmployeeRVDays` int(11) DEFAULT NULL COMMENT '剩余可申请天数',
+  `Employeestatus` int(11) NOT NULL COMMENT '员工状态（0-正常 1-锁定 2-删除）',
+  PRIMARY KEY (`Employeeid`),
+  KEY `Userid` (`Userid`),
+  KEY `Deptid` (`Deptid`),
+  CONSTRAINT `Employee_ibfk_1` FOREIGN KEY (`Userid`) REFERENCES `Sys_User` (`Userid`),
+  CONSTRAINT `Employee_ibfk_2` FOREIGN KEY (`Deptid`) REFERENCES `Dept` (`Deptid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of Employee
+-- ----------------------------
+INSERT INTO `Employee` VALUES ('1', '2', '1', '张三', '0', '22', '江苏省无锡市', '开发人员', '3000', '30', '30', '0');
+INSERT INTO `Employee` VALUES ('2', '3', '2', '李四', '1', '23', '江苏省南京市', '人事经理', '6000', '35', '35', '0');
+INSERT INTO `Employee` VALUES ('3', '4', '3', '王五', '0', '21', '江苏省徐州市', '财务人员', '3500', '30', '30', '0');
+INSERT INTO `Employee` VALUES ('4', '5', '4', '赵六', '1', '24', '江苏省苏州市', '测试人员', '3500', '30', '30', '0');
+
+
+问题描述：在EmployeeDaoImpl中查询所有员工信息并进行封装时得到的员工集合属性均为空值，说明beanutils封装错误。一开始说是属性必须小写，试过之后发现并不影响；再根据打印值发现query、map都有值，但populate（）时出错，但不报错，然后在try中使用setProperty（）和getProperty（）；试了好久发现将表名大写，查询字段全部小写，封装成功。
