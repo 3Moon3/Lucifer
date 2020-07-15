@@ -1,7 +1,10 @@
 ********
 ****
 1.Unable to start embedded container; nested exception is org.springframework.context.ApplicationContextException: Unable to start EmbeddedWebApplicationContext due to missing EmbeddedServletContainerFactory bean.
-****
-主要可能是依赖导致SpringBoot没有使用内置Tomcat容器，但是又找不到容器启动因为没有配置。当然解决办法可能优先将IDEA清除缓存并重启试试看，可能是工具的问题。不行的话可能需要按照网上方法检查jar包，进行更新。
-****
+**** V-1.0
+主要可能是依赖导致SpringBoot没有使用内置Tomcat容器，但是又找不到容器启动因为没有配置。
+当然解决办法可能优先将IDEA清除缓存并重启试试看，可能是工具的问题。不行的话可能需要按照网上方法检查jar包，进行更新。
+**** V-2.0
+原因大概是找到了，上面的原因可能是直接原因导致的项目无法启动。根本原因可能是由于IDEA使用了全局setting，因此导入项目之后使用的repository库是同一个库，当maven自动依赖jar包后可能会导致本地仓库jar包冲突。
+解决办法：重新创建一个repository目录，修改导入项目的maven配置，更新maven依赖。
 ********
