@@ -8,3 +8,25 @@
 原因大概是找到了，上面的原因可能是直接原因导致的项目无法启动。根本原因可能是由于IDEA使用了全局setting，因此导入项目之后使用的repository库是同一个库，当maven自动依赖jar包后可能会导致本地仓库jar包冲突。
 解决办法：重新创建一个repository目录，修改导入项目的maven配置，更新maven依赖。
 ********
+********
+****
+2.org.apache.poi.poifs.filesystem.OfficeXmlFileException: The supplied data appears to be in the Office 2007+ XML. You are calling the part of POI that deals with OLE2 Office Documents. You need to call a different part of POI to process this data (eg XSSF instead of HSSF)
+****
+该错误意思是说，文件中的数据是用Office2007+XML保存的，而现在却调用OLE2 Office文档处理，应该使用POI不同的部分来处理这些数据，比如使用XSSF来代替HSSF。
+具体解决办法可能是，尝试在本地手动重建xlsx和xls类型的文件，将数据复制进去，然后手动复制到项目资源路径下。再重新部署项目。
+********
+****
+3.（兆尹-导出之类的功能时）java.lang.NullPointerException/java.lang.ArrayIndexOutOfBoundsException
+****
+除去相关配置未做完全的情况，可能是有时直接复制一些文件到项目的resource路径下，无论怎么锤都不会被编译到target编译目录下，导致项目运行报异常，只能手动复制。
+**** V-1.0
+首先确认conf、Controller、Service、tpl中都做了相应且正确的修改，然后检查target输出目录，查看resource目录下的资源文件是否一致存在。若不存在则手动复制过去，可以做对应的修改。
+**** V-2.0
+对于conf下的export_conf.xml中的filePath与tpl中配置，如果在tpl中直接写文件名，则需要将对应文件直接放在tpl目录下最外层。如果为了更好区分，建立了一些tpl的对应子目录，将资源文件放在tpl的多级子目录下，则在filePath中要做对应的修改，但目前还未尝试过，直接放在tpl下的最外层是没问题的。
+********
+****
+4.java.sql.SQLException: 无效的列类型: 1111
+****
+Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象的类型时。Mybatis什么时候不能自动识别传染的对象类型：当你传入空值的时候。
+解决办法：给所有的传入参数加上jdbcType，总之：加上没有损害。【注：数据库中number类型的对应的jdbcType是numeric】
+********
