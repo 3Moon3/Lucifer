@@ -17,6 +17,7 @@
 该错误意思是说，文件中的数据是用Office2007+XML保存的，而现在却调用OLE2 Office文档处理，应该使用POI不同的部分来处理这些数据，比如使用XSSF来代替HSSF。
 具体解决办法可能是，尝试在本地手动重建xlsx和xls类型的文件，将数据复制进去，然后手动复制到项目资源路径下。再重新部署项目。
 ********
+********
 ****
 3.（兆尹-导出之类的功能时）java.lang.NullPointerException/java.lang.ArrayIndexOutOfBoundsException
 ****
@@ -26,9 +27,19 @@
 **** V-2.0
 对于conf下的export_conf.xml中的filePath与tpl中配置，如果在tpl中直接写文件名，则需要将对应文件直接放在tpl目录下最外层。如果为了更好区分，建立了一些tpl的对应子目录，将资源文件放在tpl的多级子目录下，则在filePath中要做对应的修改，但目前还未尝试过，直接放在tpl下的最外层是没问题的。
 ********
+********
 ****
 4.java.sql.SQLException: 无效的列类型: 1111
 ****
 Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象的类型时。Mybatis什么时候不能自动识别传染的对象类型：当你传入空值的时候。
 解决办法：给所有的传入参数加上jdbcType，总之：加上没有损害。【注：数据库中number类型的对应的jdbcType是numeric】
+********
+********
+****
+5.java.lang.NoClassDefFoundError
+****
+根本原因是因为Java虚拟机在编译时能找到合适的类，而在运行时不能找到合适的类导致的错误。例如在运行时我们想调用某个类的方法或者访问这个类的静态成员的时候，发现这个类不可用，此时Java虚拟机就会抛出NoClassDefFoundError错误。
+与ClassNotFoundException的不同在于，这个错误发生只在运行时需要加载对应的类不成功，而不是编译时发生。简单总结就是，NoClassDefFoundError发生在编译时对应的类可用，而运行时在Java的classpath路径中，对应的类不可用导致的错误。
+解决办法：直接原因有很多种，暂时未找到根本的解决办法。但是有一个直接的办法：在项目里手动新建一个Java类，把引用包里出错的类内容复制过去，然后将引用原来类改为引用新建类。
+********
 ********
