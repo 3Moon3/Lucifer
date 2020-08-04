@@ -48,6 +48,6 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 ****
 根本原因是Tomcat容器自动绑定IPV6的地址，导致无法访问。
 解决办法：如果是SpringBoot项目的话，使用内置Tomcat，在yml配置文件中，在server下，增加"address: 0.0.0.0"，重启项目；
-其他项目的话，在对应Tomcat下的server.xml文件中，修改connector配置, 端口不用改, 加上address="0.0.0.0", 使其绑定到IPv4，重启项目。
+其他项目的话，在对应Tomcat下的server.xml文件中，修改connector配置, 端口不用改, 加上'address="0.0.0.0"', 使其绑定到IPv4，重启项目。
 ********
 ********
