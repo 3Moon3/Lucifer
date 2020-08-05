@@ -26,6 +26,16 @@
 首先确认conf、Controller、Service、tpl中都做了相应且正确的修改，然后检查target输出目录，查看resource目录下的资源文件是否一致存在。若不存在则手动复制过去，可以做对应的修改。
 **** V-2.0
 对于conf下的export_conf.xml中的filePath与tpl中配置，如果在tpl中直接写文件名，则需要将对应文件直接放在tpl目录下最外层。如果为了更好区分，建立了一些tpl的对应子目录，将资源文件放在tpl的多级子目录下，则在filePath中要做对应的修改，但目前还未尝试过，直接放在tpl下的最外层是没问题的。
+**** V-3.0
+在项目中发现新问题，提示"业务逻辑异常，无数据"。经过debug排查发现在"com.joyintech.framework.export"包下的"CommonExportService"类中，在执行到"selecPageData"方法中的：
+    "com.joyintech.framework.grid.Page<T> p = selectPageData(selectParam);"
+时，调用了当前类的"selectPageData()"方法，方法本身没有问题，返回null。问题出在不该调用这个"selectPageData()"方法。
+解决办法：在继承了"CommonExportService"的service类中，也就是Controller里导出功能调用的service里重写"selectPageData()"方法:
+    public Page<EtrProjectDto> selectPageData(Map<String, Object> selectParam) {return selectForPage(selectParam);}
+[注]:此处调用了子类Service的重写方法，是因为在Controller方法中，调用的: 
+    return etrProjectService.export(this.getPageId(),RequestUtil.getParameters(getRequest()));
+因此当前的"this"指的是方法调用者"etrProjectService"。无论执行到哪一个类的哪一个方法，只要无具体调用（如上面的"RequestUtil.getParameters(getRequest())",进入这一步方法后，"this"指向的就是"RequestUtil"了），"this"指向的都应该是最外层源头方法的调用对象。
+因此在此处，不加"this"调用的也是"etrProjectService"重写的"selectPageData()"方法。如果"etrProjectService"中没有重写方法，才会调用父类"CommonExportService"中的方法。导致返回null异常。
 ********
 ********
 ****
