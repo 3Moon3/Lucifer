@@ -61,3 +61,10 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 其他项目的话，在对应Tomcat下的server.xml文件中，修改connector配置, 端口不用改, 加上'address="0.0.0.0"', 使其绑定到IPv4，重启项目。
 ********
 ********
+****
+7.java.lang.IllegalStateException: Logback configuration error detected
+****
+根据网上来说具体原因有很多种，自己遇到的情况是JRebel启动报错，但是普通debug启动正常。
+解决办法：对于这一情况来说，重新激活JRebel就可以解决。以后如果遇到其他情况再更新。
+********
+********
