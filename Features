@@ -1,0 +1,50 @@
+********
+****
+1.（兆尹）导出功能-导出选中行数据。
+****
+(1).首先在前台JS中，点击导出按钮事件，调用前端的导出方法。在方法中：
+    首先判断搜索结果是否为空，防止下一步获取选中操作时报错：if (table != null && table != ''){...下一步代码}
+    然后判断当前选中的行数：var selArr = table.getAllCheckedRows();
+    获取选中数据：var datas = JSON.stringify(selArr);
+    如果没有选中任何一行，也就是当selArr为空时，默认导出查询的所有结果：var paramObj = getSearchParams();
+    然后调用封装的方法：Joyin.exportExcel('export', paramObj);
+    若选中行数大于0，导出选中行的所有数据：Joyin.exportExcel('export', {datas : datas});
+    ---------------------------------
+    参考代码：
+    var exportExcel = function() {
+            if (table != null && table != '') {
+                var selArr = table.getAllCheckedRows();
+                var datas = JSON.stringify(selArr);
+            }
+            if (!selArr || selArr.length == 0) {
+                var paramObj = getSearchParams();
+                Joyin.exportExcel('export', paramObj);
+            } else {
+                Joyin.exportExcel('export', {
+                    datas : datas
+                });
+            }
+        };
+(2).数据传到后台后，直接获取：String datas = this.getParam("datas");
+    创建对应数据对象的空的List集合用于存放对象，然后根据前台传的参数进行判断：
+    如果datas为空，则查询所有结果：listdto = payTheVatQuery001Service.findByList(RequestUtil.getPageParam());
+    如果datas不为空，则直接将datas转换为List集合：listdto = JsonUtils.json2List(datas, PayTheVatQuery001Dto.class);
+    生成导出文件：File outFile = payTheVatQuery001Service.makeFile("/com/joyintech/product/paythevatquery/conf/export_paythevatquery001.xml", listdto);
+    执行导出：return ExportUtil.export(this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS+ DateUtil.format(new Date()) + SystemGlobalConstant.CLOSE_PARENTHESIS + SystemGlobalConstant.POINT + FileNameUtil.getFileExtName(outFile), outFile, true);
+    ---------------------------------
+    参考代码：
+    @RequestMapping(ACTION_EXPORT)
+	  public ResponseEntity<byte[]> export() throws Exception {
+      String datas = this.getParam("datas");
+      List<PayTheVatQuery001Dto> listdto;
+      if (datas == null) {
+        listdto = payTheVatQuery001Service.findByList(RequestUtil.getPageParam());
+      } else {
+        listdto = JsonUtils.json2List(datas, PayTheVatQuery001Dto.class);
+      }
+      File outFile = payTheVatQuery001Service.makeFile(
+          "/com/joyintech/product/paythevatquery/conf/export_paythevatquery001.xml", listdto);
+      return ExportUtil.export(this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
+          + DateUtil.format(new Date()) + SystemGlobalConstant.CLOSE_PARENTHESIS + SystemGlobalConstant.POINT
+          + FileNameUtil.getFileExtName(outFile), outFile, true);
+	}
