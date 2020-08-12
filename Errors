@@ -7,6 +7,9 @@
 **** V-2.0
 原因大概是找到了，上面的原因可能是直接原因导致的项目无法启动。根本原因可能是由于IDEA使用了全局setting，因此导入项目之后使用的repository库是同一个库，当maven自动依赖jar包后可能会导致本地仓库jar包冲突。
 解决办法：重新创建一个repository目录，修改导入项目的maven配置，更新maven依赖。
+[注]：给<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-tomcat</artifactId>
+        加上：<scope>compile</scope>
 **** V-3.0
 又遇到这个问题，在试过现有的解决办法之后，仍然无法解决。原因不明，待更新。
 ********
