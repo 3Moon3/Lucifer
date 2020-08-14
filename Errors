@@ -71,3 +71,9 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 解决办法：对于这一情况来说，重新激活JRebel就可以解决。以后如果遇到其他情况再更新。
 ********
 ********
+8.Expected one result (or null) to be returned by selectOne(), but found: 5
+原因：myabtis的xml配置bean数据库等均无错误，当 select返回单个结果集时，不会报错，多个结果集时则报错。
+默认的dto查询结果为selectone(),bean无法接受多个结果集，则改用List就可以接受多个结果集,所以要用List替换dto
+**********
+********
+
