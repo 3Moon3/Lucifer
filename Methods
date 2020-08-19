@@ -1,0 +1,28 @@
+********
+****
+1.(兆尹)Map<String,Object> param=RequestUtil.getParameters(getRequest());//获取包括'page'、'length'、'pageId'等在内的请求参数
+****
+********
+****
+2.(兆尹)String statusDate= DateUtil.format((Date) CacheUtil.getAppCache("nowSysDate", Date.class));
+  通过(Date) CacheUtil.getAppCache("nowSysDate", Date.class)获取日期类型的平台日日期
+  通过DateUtil.format()将日期类型转换为String类型
+****
+********
+****
+3.(兆尹)int year=DateUtil.getYear("2020-8-19");//通过String类型参数获取int类型的年份
+  int month=DateUtil.getMonth("2020-8-19");//通过String类型参数获取int类型的月份
+  String yearStr=DateUtil.getYearStr("2020-8-19");//通过String类型的参数获取对应String类型的年份字符串
+  String monthStr=String.valueOf(DateUtil.getMonth("2020-8-19"));//通过String类型的参数获取对应的int类型的月份，然后通过String.valueOf获取对应String类型的月份字符串
+  Date date=DateUtil.parse("2020-8-19");//将String类型参数转换为日期类型：Tue Apr 30 00:00:00 CST 2019
+  Date date=DateUtil.getLastDay("2020-8-19");//通过String类型参数获取对应月份的最后一天的日期类型
+  Date date=DateUtil.getFirstDay("2020-8-19");//通过String类型参数获取对应月份的第一天的日期类型
+****
+********
+****
+4.(兆尹)File file=TisUtil.createFile(data, exceltemplate, filename);//创建导出文件：
+  data:数据 exceltemplate:导出模板路径(如："hsyh/CrossFinancialReport007") filename:文件名(包括文件类型如："CJ01-7 理财产品投资证券明细表_2019年4月.xls")
+  ExportUtil.export(filename, file, true);//导出的一种方式，返回ResponseEntity<byte[]> 类型，也就是在导出方法最后直接return。
+****
+********
+  
