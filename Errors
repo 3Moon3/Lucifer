@@ -12,6 +12,12 @@
         加上：<scope>compile</scope>
 **** V-3.0
 又遇到这个问题，在试过现有的解决办法之后，仍然无法解决。原因不明，待更新。
+**** V-4.0
+再次遇到，记录解决步骤：
+一、导入项目后立即更改maven配置，选择项目带的repository.xml作为setting文件，提前创建一个repository作为对应仓库，更改后进行reimport。
+二、在tams的app下的pom文件中的<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>后添加<scope>complier</scope>。
+三、启动，若仍报错，尝试V-2.0办法，不行就直接将repository仓库换个磁盘试试。
 ********
 ********
 ****
