@@ -84,3 +84,10 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 解决办法：将group by放入子查询中使用或者在group by后面加上所有非聚合函数字段。
 ********
 ********
+****
+9.ORA-12528, TNS:listener: all appropriate instances are blocking new connecti
+****
+报错原因（来源网络）：总结RA-12528问题是因为监听中的服务使用了动态服务,系统启动后,数据库没有正常的MOUNT,因此在动态模式下,就会出现这个问题。
+解决办法：对于自己，直接重启服务中的oracle监听服务就好了，对于网上的解决办法，遇到了再更新。
+********
+********
