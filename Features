@@ -48,3 +48,15 @@
           + DateUtil.format(new Date()) + SystemGlobalConstant.CLOSE_PARENTHESIS + SystemGlobalConstant.POINT
           + FileNameUtil.getFileExtName(outFile), outFile, true);
 	}
+********
+********
+****
+2.对某个界面的选择框的选项进行剔除。（取消选择框的某个选择）
+****
+(1)、主要做法可能是将单选框或者一些其他类型改成下拉选择框，然后赋予初始值，进行禁用。
+(2)、在class中将'input-checkbox'之类的换成'input-select'。
+     然后在'data-th-initValue'中赋予初始值，即保留的值。
+     将input框设置为'disabled'。
+主要是针对两个保留一个的情况，其他情况待更新。
+********
+********
