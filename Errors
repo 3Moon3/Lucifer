@@ -25,6 +25,7 @@
 ****
 该错误意思是说，文件中的数据是用Office2007+XML保存的，而现在却调用OLE2 Office文档处理，应该使用POI不同的部分来处理这些数据，比如使用XSSF来代替HSSF。
 具体解决办法可能是，尝试在本地手动重建xlsx和xls类型的文件，将数据复制进去，然后手动复制到项目资源路径下。再重新部署项目。
+[注]：不要直接修改文件名来修改文件格式，最好是另存为。
 ********
 ********
 ****
@@ -34,7 +35,9 @@
 **** V-1.0
 首先确认conf、Controller、Service、tpl中都做了相应且正确的修改，然后检查target输出目录，查看resource目录下的资源文件是否一致存在。若不存在则手动复制过去，可以做对应的修改。
 **** V-2.0
-对于conf下的export_conf.xml中的filePath与tpl中配置，如果在tpl中直接写文件名，则需要将对应文件直接放在tpl目录下最外层。如果为了更好区分，建立了一些tpl的对应子目录，将资源文件放在tpl的多级子目录下，则在filePath中要做对应的修改，但目前还未尝试过，直接放在tpl下的最外层是没问题的。
+对于conf下的export_conf.xml中的filePath与tpl中配置，如果在tpl中直接写文件名作为路径，则需要将对应文件直接放在tpl目录下最外层。如果为了更好区分，建立了一些tpl的对应子目录，将资源文件放在tpl的多级子目录下，则在filePath中要做对应的修改，但目前还未尝试过，直接放在tpl下的最外层是没问题的。
+放在多级子目录下如："filePath="jnyh/JiningRepoPledgeSearch001-01.xlsx""
+在定义模板时也可直接："String exceltemplate = "jnyh/JiningRepoPledgeSearch001-01""(不用加后缀名)
 **** V-3.0
 在项目中发现新问题，提示"业务逻辑异常，无数据"。经过debug排查发现在"com.joyintech.framework.export"包下的"CommonExportService"类中，在执行到"selecPageData"方法中的：
     "com.joyintech.framework.grid.Page<T> p = selectPageData(selectParam);"
@@ -91,3 +94,20 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 解决办法：对于自己，直接重启服务中的oracle监听服务就好了，对于网上的解决办法，遇到了再更新。
 ********
 ********
+****
+10.org.apache.catalina.LifecycleException: Failed to start component
+****
+报错原因：根据网上有多种，自己遇到的情况是端口占用。
+解决办法：查询占用端口，解除占用重启。遇到其他情况再更新。
+********
+********
+****
+11.org.apache.ibatis.reflection.ReflectionException:There is no getter for property named '*' in 'class java.lang.String
+****
+报错原因：mybatis在对parameterType="String"的sql语句做了限制，当使用<if test="username != null">这样的条件判断时，就会出现该错误。
+解决办法：1.首先确定mapper.xml中："parameterType="String""
+         2.然后在mapper接口中，在方法参数上给参数加上"@Param("mapper.xml中要使用的对应参数名")"注解。
+         3.或者第二步也可以直接修改为:"<if test="_parameter!= null">"
+********
+********
+****
