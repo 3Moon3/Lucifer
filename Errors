@@ -52,9 +52,11 @@
 ********
 ****
 4.java.sql.SQLException: 无效的列类型: 1111
-****
+**** V-1.0
 Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象的类型时。Mybatis什么时候不能自动识别传染的对象类型：当你传入空值的时候。
-解决办法：给所有的传入参数加上jdbcType，总之：加上没有损害。【注：数据库中number类型的对应的jdbcType是numeric】
+解决办法：给所有的传入参数加上jdbcType，总之：加上没有损害。【注：数据库中number类型的对应的jdbcType是numeric、varchar类型对应的jdbcType也是varchar】
+**** V-2.0
+在具体项目中遇到，报错但是找不到具体在哪个xml文件里出错，直接全局搜索这个报错字段，然后将所有用到的xml文件里都加上对应jdbcType。
 ********
 ********
 ****
@@ -111,3 +113,38 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 ********
 ********
 ****
+12.ORA-01481  无效数字格式模型&to_char()
+****
+报错原因：to_char()函数在转化日期到字符串的时候，很容易出问题，需要看好原始格式后再决定是否使用。此处报错是因为数据库中存储的已经是字符串格式了，因此在使用函数时无法识别。
+解决办法：不使用to_char()函数，直接使用原始数据。或者先通过to_date()转换为日期格式，再使用to_char()函数。
+********
+********
+****
+13.ORA-01722: invalid number
+****
+报错原因：非DATE类型时间不能直接用to_char转换。
+解决办法：1.用substr截取月份
+	   and substr(outTime,6,2) = to_char(sysdate,'mm')
+	 2.先to_date转换为时间类型再取月份
+	   and to_char(to_date(outTime,'YYYY-MM-DD HH24:MI:SS'), 'MM')=to_char(sysdate,'mm')
+********
+********
+****
+14.ORA-01810: 格式代码出现两次
+****
+报错原因：错误语句段：AND V.UPLOAD_DATE <=TO_DATE ('2013-11-11 23:59:59', 'YYYY-MM-DD HH:MM:SS')
+	 正确语句段：AND V.UPLOAD_DATE <=TO_DATE ('2013-11-11 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+     	 1：格式代码出现两次，这个错误提示明显的指出是格式化字符串重复了两次,在Oracle中不应该将某个格式重复两次，否则Oracle就不知道要从哪个占位区间去解析该字段，即使写成AND V.UPLOAD_DATE <=TO_DATE ('2013-11-11 23:59:59', 'YYYY-MM-DD HH:mm:SS')也是不灵的，因为SQL中不区分大小写，MM和mm被认为是相同的格式代码，所以Oracle的SQL采用mi来代替分钟。 
+         2：当修改为AND V.UPLOAD_DATE <=TO_DATE ('2013-11-11 23:59:59', 'YYYY-MM-DD HH:MI:SS')时又会报ORA-01849: 小时值必须介于 1 和 12 之间，由此可见HH只支持小时数在1-12之间的，要以24小时的形式显示出来时要将HH修改为HH24
+解决办法：在mybatis的XML中可以直接写成如下形式：          
+            to_date('${endUploadDateString} 23:59:59','YYYY-MM-DD HH24:MI:SS')
+********
+********
+****
+15.org.springframework.core.NestedIOException: Failed to parse mapping resource: 'file [G:\workspace\chanping\jn-code\tams\app\target\classes\com\joyintech\tams\jnyh\jiningdayreport\dao\sqlmap\JiningDayReportMapper.xml]'; nested exception is org.apache.ibatis.builder.BuilderException: Error creating document instance.  Cause: org.xml.sax.SAXParseException; lineNumber: 685; columnNumber: 21; The content of elements must consist of well-formed character data or markup.
+****
+报错原因：根据提示指出了具体是哪个文件的哪一行代码里出错，元素的内容必须包含格式正确的字符数据或标记。
+	 此处我错误的原因是因为在xml中，'<'和'&'都是非法的，但是'>'是合法的。当使用'<'时，也会提示：'Tag name expected'。
+解决办法：将实体引用代替非法字符即可，如：'<='应改写为：'&lt;='
+********
+********
