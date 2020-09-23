@@ -18,6 +18,8 @@
 二、在tams的app下的pom文件中的<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>后添加<scope>complier</scope>。
 三、启动，若仍报错，尝试V-2.0办法，不行就直接将repository仓库换个磁盘试试。
+**** V-5.0
+解决办法：在启动配置"Run/Debug Configurations"中勾选上"Include dependencies with 'Provided' scope"选项
 ********
 ********
 ****
