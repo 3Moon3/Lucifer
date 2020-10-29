@@ -157,3 +157,14 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 解决办法：将执行的sql语句中未明确是哪个表的字段进行表名指定。
 ********
 ********
+****
+17.java.lang.NumberFormatException: For input string:"A1"
+****
+报错原因：在mabatis中传参并且使用"if test="判断的时候，传递的参数类型必须与匹配的值的类型一致，否则会在比较时因为类型不一样报错。
+解决办法：对参数进行类型转换。
+	 如：典型的String类型参数，在进行"if test="判断时：
+	     错误写法：<if test="ifShield==1">    或者 <if test="ifShield=="1"">
+	     正确写法：<if test="param eq 'Y'.toString()">    或者  <if test="name == &quot;Y&quot;">   或者  <if test='index == "Y"'>
+	 主要注意写的时候注意双引号的问题。
+********
+********
