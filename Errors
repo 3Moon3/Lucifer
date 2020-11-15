@@ -182,5 +182,37 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 解决办法：将 <input>标签换为<select>标签使用。
 ********
 ********
-
-
+****
+20.在Linux服务器上部署并启动Redis后，使用Redis Desktop Manager无法连接，且确认配置文件和操作无误。
+****
+报错原因：服务器开启了防火墙。
+解决办法：
+	1:查看防火状态
+	systemctl status firewalld
+	service  iptables status
+	2:暂时关闭防火墙
+	systemctl stop firewalld
+	service  iptables stop
+	3:永久关闭防火墙
+	systemctl disable firewalld
+	chkconfig iptables off
+	4:重启防火墙
+	systemctl enable firewalld
+	service iptables restart  
+	5:永久关闭后重启
+	//暂时还没有试过
+	chkconfig iptables on
+********
+********
+****
+21.Ora-12700 invalid nls value (nls_language) 修改Oracle字符集后启动报错。
+****
+报错原因：由于修改的字符集不合法，导致Oracle无法启动。
+解决办法：通过 'sqlplus / as sysdba'登录oracle，在sql下执行：
+	create pfile = "[任意的存放文件的路径，如：'C:\Users\...\pfile.txt'或者'/u01/app/.../pfile.txt']" from spfile;
+	然后修改新创建的pfile文件里的'nls_language'和'nls_territory';
+	create spfile from pfile = "[上面的路径]";
+	之后再进入sql通过"STARTUP"启动Oracle即可。
+********
+********
+	
