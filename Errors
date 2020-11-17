@@ -20,6 +20,11 @@
 三、启动，若仍报错，尝试V-2.0办法，不行就直接将repository仓库换个磁盘试试。
 **** V-5.0
 解决办法：在启动配置"Run/Debug Configurations"中勾选上"Include dependencies with 'Provided' scope"选项
+**** V-6.0
+在IDEA中通过maven的install命令进行打包之后，通过 "java -jar tams.jar"启动服务，报错。
+解决办法：打开tams.jar包，修改 "tams.jar\META-INF\maven\com.joyintech\tams" 下的pom.xml文件，将
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-tomcat</artifactId>后的 "<scope>complier</scope>"去掉，重新启动服务即可。
 ********
 ********
 ****
@@ -215,4 +220,17 @@ Mybatis什么时候使用jdbcType：当Mybatis不能自动识别你传入对象�
 	之后再进入sql通过"STARTUP"启动Oracle即可。
 ********
 ********
-	
+****
+22.Failed to clean project: Failed to delete...（进行打包的时候报错）
+****
+报错原因：之前编译的工程还在运行，无法clean，导致maven生命周期无法继续进行。
+解决办法：关闭控制台，重新运行maven项目；不行的话通过任务管理器或者命令杀掉进程。
+********
+********
+****
+23.Could not resolve dependencies for project...(在文件目录下通过cmd方式，"mvn clean install"打包报错)
+****
+报错原因：暂时不明
+解决办法：可以尝试直接在IDEA中，通过maven的"install"命令进行打包。
+********
+********
